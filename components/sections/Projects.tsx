@@ -2,131 +2,178 @@
 
 import { Badge } from '@chroma-yesid/ui';
 import Image from 'next/image';
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
-import { Accent } from '@/components/ui/DisplayHeading';
-import { Section } from '@/components/ui/Section';
+import { useEffect, useRef, useState } from 'react';
+import { Accent, DisplayHeading } from '@/components/ui/DisplayHeading';
 import { projects, type Project } from '@/content/proyectos';
 
-/** Vista previa que sigue al cursor con inercia (solo con mouse; en pantallas táctiles cada fila muestra su portada). */
-function useFollower() {
-  const ref = useRef<HTMLDivElement>(null);
-  const target = useRef({ x: 0, y: 0 });
-  const pos = useRef({ x: 0, y: 0 });
+const HEADER = 64; // alto del header fijo (4rem)
 
-  useEffect(() => {
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const move = (e: PointerEvent) => {
-      if (e.pointerType !== 'mouse') return;
-      target.current = { x: e.clientX, y: e.clientY };
-    };
-    addEventListener('pointermove', move);
-    let raf = requestAnimationFrame(function loop() {
-      pos.current.x += (target.current.x - pos.current.x) * 0.14;
-      pos.current.y += (target.current.y - pos.current.y) * 0.14;
-      const vx = target.current.x - pos.current.x;
-      const rot = Math.max(-10, Math.min(10, vx * 0.06));
-      if (ref.current) {
-        ref.current.style.transform = `translate(${pos.current.x}px, ${pos.current.y}px) translate(-50%, -50%) rotate(${rot}deg)`;
-      }
-      raf = requestAnimationFrame(loop);
-    });
-    return () => {
-      removeEventListener('pointermove', move);
-      cancelAnimationFrame(raf);
-    };
-  }, []);
-
-  return ref;
+/** Capturas de la app en abanico, como teléfonos. */
+function Phones({ shots }: { shots: NonNullable<Project['gallery']> }) {
+  const pose = ['-translate-x-[72%] -rotate-[7deg] scale-[.86]', 'z-10', 'translate-x-[72%] rotate-[7deg] scale-[.86]'];
+  const items = [shots[1], shots[0], shots[3] ?? shots[2]].filter(Boolean) as NonNullable<Project['gallery']>;
+  return (
+    <div className="absolute inset-0 z-20 flex items-center justify-center" aria-hidden="true">
+      {items.map((g, i) => (
+        <Image
+          key={g.src}
+          src={g.src}
+          alt=""
+          width={440}
+          height={957}
+          sizes="140px"
+          className={`absolute h-[88%] w-auto rounded-[1.1rem] border-2 border-cover-line shadow-lg transition-transform duration-500 group-hover:scale-[.92] ${pose[i] ?? ''}`}
+        />
+      ))}
+    </div>
+  );
 }
 
-/** Portada de un proyecto: captura real si la hay (alineada arriba), si no el degradado. */
-function coverStyle(p: Project): CSSProperties {
-  return p.image
-    ? { background: `#0a0a0a url(${p.image}) center top / cover no-repeat` }
-    : { background: p.cover };
+function Card({ p, i }: { p: Project; i: number }) {
+  const n = String(i + 1).padStart(2, '0');
+  return (
+    <article className="group w-[min(23rem,78vw)] shrink-0 snap-start">
+      <div className="relative h-[min(40svh,26rem)] overflow-hidden rounded-xl border border-border" style={{ background: p.cover }}>
+        {p.gallery ? <Phones shots={p.gallery} /> : null}
+        <span className="absolute top-4 left-4 rounded-full border border-cover-line bg-cover-scrim px-3 py-1 font-mono text-caption tracking-wider text-cover-foreground uppercase backdrop-blur">
+          {p.category}
+        </span>
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-1 -bottom-3 text-[clamp(5rem,12vw,8rem)] leading-none font-bold tracking-tighter text-transparent mix-blend-difference [-webkit-text-stroke:1.5px_#fff]"
+        >
+          {n}
+        </span>
+      </div>
+      <div className="pt-5">
+        <div className="flex items-baseline gap-3">
+          <h3 className="text-heading-xl font-bold tracking-tight">{p.name}</h3>
+          <span className="font-mono text-caption text-muted-foreground">{p.year}</span>
+          {p.draft ? (
+            <Badge tone="neutral" appearance="subtle">
+              Ejemplo
+            </Badge>
+          ) : null}
+        </div>
+        <p className="mt-1 font-mono text-caption tracking-wider text-muted-foreground uppercase">{p.stack}</p>
+        <p className="mt-3 line-clamp-3 text-body-md text-muted-foreground">{p.description}</p>
+        {p.url ? (
+          <a
+            href={p.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 inline-block text-body-md font-medium underline underline-offset-4 hover:text-brand"
+          >
+            {p.linkLabel ?? 'Ver proyecto'} ↗
+          </a>
+        ) : null}
+      </div>
+    </article>
+  );
 }
 
 export function Projects() {
-  const [active, setActive] = useState<number | null>(null);
-  const follower = useFollower();
-  const current = active === null ? null : projects[active];
+  const outer = useRef<HTMLElement>(null);
+  const track = useRef<HTMLDivElement>(null);
+  const bar = useRef<HTMLSpanElement>(null);
+  const count = useRef<HTMLSpanElement>(null);
+  const [pinned, setPinned] = useState(false);
+  const [height, setHeight] = useState<number | undefined>();
+
+  // Con mouse y pantalla ancha, la sección se ancla y el scroll vertical mueve las tarjetas;
+  // en táctil o con movimiento reducido es un carrusel normal con scroll horizontal.
+  useEffect(() => {
+    const mq = matchMedia('(min-width: 768px) and (hover: hover) and (prefers-reduced-motion: no-preference)');
+    const update = () => setPinned(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+
+  useEffect(() => {
+    const el = outer.current;
+    const t = track.current;
+    if (!pinned || !el || !t) return;
+    let dist = 0;
+    const measure = () => {
+      dist = Math.max(0, t.scrollWidth - innerWidth);
+      setHeight(dist + innerHeight - HEADER);
+    };
+    const onScroll = () => {
+      const p = dist === 0 ? 0 : Math.min(1, Math.max(0, (HEADER - el.getBoundingClientRect().top) / dist));
+      t.style.transform = `translate3d(${-p * dist}px, 0, 0)`;
+      if (bar.current) bar.current.style.width = `${p * 100}%`;
+      if (count.current) count.current.textContent = String(Math.round(p * (projects.length - 1)) + 1).padStart(2, '0');
+    };
+    measure();
+    onScroll();
+    const ro = new ResizeObserver(() => {
+      measure();
+      onScroll();
+    });
+    ro.observe(t);
+    addEventListener('scroll', onScroll, { passive: true });
+    addEventListener('resize', onScroll);
+    return () => {
+      ro.disconnect();
+      removeEventListener('scroll', onScroll);
+      removeEventListener('resize', onScroll);
+      t.style.transform = '';
+    };
+  }, [pinned]);
+
+  const gutter = 'pl-[max(1.25rem,calc((100vw-1280px)/2+2rem))] pr-[max(1.25rem,calc((100vw-1280px)/2+2rem))]';
 
   return (
-    <Section
+    <section
       id="proyectos"
-      eyebrow="(02) — Proyectos"
-      title={
-        <>
-          Lo que <Accent>he construido</Accent>.
-        </>
-      }
-      intro="Los proyectos reales llevan enlace; los marcados “Ejemplo” son muestras mientras agrego más. Pasa el cursor sobre cada fila para ver la portada."
+      ref={outer}
+      className="relative border-t border-border"
+      style={pinned && height ? { height } : undefined}
     >
-      <ul onPointerLeave={() => setActive(null)} className="border-t border-border">
-        {projects.map((p, i) => (
-          <li
-            key={p.name}
-            className="border-b border-border"
-            onPointerEnter={(e) => e.pointerType === 'mouse' && setActive(i)}
-          >
-            <div className="grid gap-x-6 gap-y-2 py-6 md:grid-cols-[minmax(0,1fr)_minmax(0,14rem)_minmax(0,12rem)] md:items-center md:py-7">
-              <div className="flex items-baseline gap-3">
-                <h3 className="text-display-xl font-bold transition-transform duration-300 md:[li:hover_&]:translate-x-3">
-                  {p.name}
-                </h3>
-                <span className="font-mono text-caption text-muted-foreground">{p.year}</span>
-                {p.draft ? (
-                  <Badge tone="neutral" appearance="subtle">
-                    Ejemplo
-                  </Badge>
-                ) : null}
-              </div>
-              <p className="font-mono text-caption tracking-wider text-muted-foreground uppercase">{p.category}</p>
-              <p className="text-body-sm text-muted-foreground md:text-right">{p.stack}</p>
-              <p className="text-body-md text-muted-foreground md:col-span-3 md:max-w-[40rem]">{p.description}</p>
-              {p.gallery ? (
-                <ul className="flex gap-3 md:col-span-3" aria-label={`Capturas de ${p.name}`}>
-                  {p.gallery.map((g) => (
-                    <li key={g.src}>
-                      <Image src={g.src} alt={g.alt} width={440} height={957} sizes="(min-width: 640px) 176px, 144px" className="w-36 rounded-xl border border-border shadow-md sm:w-44 h-auto" />
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-              {p.url ? (
-                <a
-                  href={p.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-body-md font-medium underline underline-offset-4 hover:text-brand md:col-span-3"
-                >
-                  {p.linkLabel ?? 'Ver proyecto'} ↗
-                </a>
-              ) : null}
-              <div
-                aria-hidden="true"
-                className="aspect-[16/7] rounded-lg md:hidden"
-                style={coverStyle(p)}
-              />
-            </div>
-          </li>
-        ))}
-      </ul>
-
       <div
-        ref={follower}
-        aria-hidden="true"
-        className="pointer-events-none fixed top-0 left-0 z-20 hidden aspect-[4/3] w-80 overflow-hidden rounded-lg shadow-lg transition-opacity duration-200 md:block"
-        style={{ opacity: current ? 1 : 0 }}
+        className={
+          pinned
+            ? 'sticky top-16 flex h-[calc(100svh-4rem)] flex-col justify-center gap-8 overflow-hidden'
+            : 'flex flex-col gap-10 py-20'
+        }
       >
-        {projects.map((p, i) => (
-          <div
-            key={p.name}
-            className="absolute inset-0 transition-[clip-path] duration-500 ease-in-out"
-            style={{ ...coverStyle(p), clipPath: active === i ? 'inset(0)' : 'inset(100% 0 0 0)', zIndex: active === i ? 2 : 1 }}
-          />
-        ))}
+        <div className="mx-auto w-full max-w-[1280px] px-5 md:px-8">
+          <div className="flex items-end justify-between gap-6">
+            <div>
+              <p className="font-mono text-caption tracking-wider text-muted-foreground uppercase">(02) — Proyectos</p>
+              <div className="mt-4">
+                <DisplayHeading>
+                  Lo que <Accent>he construido</Accent>.
+                </DisplayHeading>
+              </div>
+            </div>
+            <div className="hidden shrink-0 text-right md:block" aria-hidden="true">
+              <p className="font-mono text-caption tracking-wider text-muted-foreground uppercase">
+                <span ref={count}>01</span> / {String(projects.length).padStart(2, '0')}
+              </p>
+              <span className="mt-2 block h-px w-40 bg-border">
+                <span ref={bar} className="block h-px w-0 bg-foreground" />
+              </span>
+            </div>
+          </div>
+          <p className="mt-3 max-w-[40rem] text-body-md text-muted-foreground">
+            Los proyectos reales llevan enlace; los marcados “Ejemplo” son muestras mientras agrego más.{' '}
+            {pinned ? 'Sigue bajando para recorrerlos.' : 'Desliza para ver todos →'}
+          </p>
+        </div>
+
+        <div
+          data-audit-ignore
+          className={pinned ? 'overflow-hidden' : 'snap-x snap-proximity overflow-x-auto pb-4 [scrollbar-width:thin]'}
+        >
+          <div ref={track} className={`flex w-max gap-6 ${gutter} will-change-transform`}>
+            {projects.map((p, i) => (
+              <Card key={p.name} p={p} i={i} />
+            ))}
+          </div>
+        </div>
       </div>
-    </Section>
+    </section>
   );
 }
