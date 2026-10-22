@@ -42,11 +42,13 @@ export const projects: Project[] = [
     type: 'app',
     stack: 'Expo, React Native, Supabase',
     description:
-      'App móvil para entusiastas de los carros: garaje, viajes, misiones, ranking y social, con escaneo de vehículos con IA y suscripción premium. Estética oscura estilo cyberpunk.',
+      'App móvil para entusiastas de los carros: garaje, viajes, misiones, ranking y social, con escaneo de vehículos con IA y suscripción premium. Estética oscura estilo cyberpunk. Las capturas de garaje usan datos de ejemplo.',
     cover: 'linear-gradient(135deg, #0a0a0a, #00a3b8 60%, #00e5ff)',
     image: '/proyectos/performa-club/login.jpg',
     gallery: [
       { src: '/proyectos/performa-club/login.jpg', alt: 'Pantalla de acceso de Performa Club con un auto deportivo y neones' },
+      { src: '/proyectos/performa-club/garage.jpg', alt: 'Garaje de Performa Club con dos carros de ejemplo y sus modificaciones' },
+      { src: '/proyectos/performa-club/detalle.jpg', alt: 'Detalle de un carro de ejemplo con potencia, modificaciones y especificaciones' },
       { src: '/proyectos/performa-club/misiones.jpg', alt: 'Misiones de Performa Club: seis retos con puntos y progreso' },
     ],
   },
