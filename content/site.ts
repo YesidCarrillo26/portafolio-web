@@ -17,7 +17,7 @@ export const site = {
   timeZone: 'America/Bogota',
   whatsapp: process.env.NEXT_PUBLIC_WHATSAPP ?? WHATSAPP_PLACEHOLDER,
   year: 2026,
-  repoUrl: 'https://github.com/YesidCarrillo26/portafolio',
+  repoUrl: 'https://github.com/YesidCarrillo26/portafolio-web',
   socials: [
     { label: 'GitHub', href: 'https://github.com/YesidCarrillo26' },
   ],
