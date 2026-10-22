@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge } from '@chroma-yesid/ui';
+import Image from 'next/image';
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Accent } from '@/components/ui/DisplayHeading';
 import { Section } from '@/components/ui/Section';
@@ -83,6 +84,15 @@ export function Projects() {
               <p className="font-mono text-caption tracking-wider text-muted-foreground uppercase">{p.category}</p>
               <p className="text-body-sm text-muted-foreground md:text-right">{p.stack}</p>
               <p className="text-body-md text-muted-foreground md:col-span-3 md:max-w-[40rem]">{p.description}</p>
+              {p.gallery ? (
+                <ul className="flex gap-3 md:col-span-3" aria-label={`Capturas de ${p.name}`}>
+                  {p.gallery.map((g) => (
+                    <li key={g.src}>
+                      <Image src={g.src} alt={g.alt} width={440} height={957} sizes="(min-width: 640px) 176px, 144px" className="w-36 rounded-xl border border-border shadow-md sm:w-44 h-auto" />
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
               {p.url ? (
                 <a
                   href={p.url}

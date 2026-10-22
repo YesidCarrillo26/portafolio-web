@@ -16,6 +16,8 @@ export interface Project {
   url?: string;
   /** Captura (ruta en /public) que reemplaza al degradado como portada. */
   image?: string;
+  /** Capturas adicionales (rutas en /public) que se muestran bajo la descripción. */
+  gallery?: { src: string; alt: string }[];
   /** Texto del enlace a `url`. */
   linkLabel?: string;
 }
@@ -43,6 +45,10 @@ export const projects: Project[] = [
       'App móvil para entusiastas de los carros: garaje, viajes, misiones, ranking y social, con escaneo de vehículos con IA y suscripción premium. Estética oscura estilo cyberpunk.',
     cover: 'linear-gradient(135deg, #0a0a0a, #00a3b8 60%, #00e5ff)',
     image: '/proyectos/performa-club/login.jpg',
+    gallery: [
+      { src: '/proyectos/performa-club/login.jpg', alt: 'Pantalla de acceso de Performa Club con un auto deportivo y neones' },
+      { src: '/proyectos/performa-club/misiones.jpg', alt: 'Misiones de Performa Club: seis retos con puntos y progreso' },
+    ],
   },
   {
     name: 'Atlas',
