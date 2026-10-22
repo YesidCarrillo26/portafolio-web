@@ -52,7 +52,7 @@ export function Projects() {
           Lo que <Accent>he construido</Accent>.
         </>
       }
-      intro="Muestras de ejemplo mientras agrego los proyectos reales. Pasa el cursor sobre cada fila para ver la portada."
+      intro="Los proyectos reales llevan enlace; los marcados “Ejemplo” son muestras mientras agrego más. Pasa el cursor sobre cada fila para ver la portada."
     >
       <ul onPointerLeave={() => setActive(null)} className="border-t border-border">
         {projects.map((p, i) => (
@@ -76,6 +76,16 @@ export function Projects() {
               <p className="font-mono text-caption tracking-wider text-muted-foreground uppercase">{p.category}</p>
               <p className="text-body-sm text-muted-foreground md:text-right">{p.stack}</p>
               <p className="text-body-md text-muted-foreground md:col-span-3 md:max-w-[40rem]">{p.description}</p>
+              {p.url ? (
+                <a
+                  href={p.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-body-md font-medium underline underline-offset-4 hover:text-brand md:col-span-3"
+                >
+                  {p.linkLabel ?? 'Ver proyecto'} ↗
+                </a>
+              ) : null}
               <div
                 aria-hidden="true"
                 className="aspect-[16/7] rounded-lg md:hidden"

@@ -1,5 +1,5 @@
 /**
- * Proyectos del portafolio. Hoy son MUESTRAS DE EJEMPLO (`draft: true`): se muestran con la etiqueta "Ejemplo"
+ * Proyectos del portafolio. Los que no llevan `draft` son reales; el resto son MUESTRAS DE EJEMPLO (`draft: true`): se muestran con la etiqueta "Ejemplo"
  * hasta que llenes la hoja "Mi perfil" con proyectos reales. Reemplaza este arreglo y quita `draft`.
  */
 export interface Project {
@@ -14,9 +14,23 @@ export interface Project {
   /** Muestra de ejemplo, no un proyecto real. */
   draft?: boolean;
   url?: string;
+  /** Texto del enlace a `url`. */
+  linkLabel?: string;
 }
 
 export const projects: Project[] = [
+  {
+    name: 'Chroma',
+    year: '2026',
+    category: 'Design system',
+    type: 'web',
+    stack: 'React, Tailwind v4, Storybook',
+    description:
+      'Design system propio para web y mobile: más de 40 componentes con el mismo contrato de props, tokens compartidos, tema oscuro y accesibilidad probada. Este sitio está hecho con él.',
+    cover: 'linear-gradient(135deg, #111110, #c42b00 60%, #ff3b00)',
+    url: 'https://chroma-storybook.vercel.app',
+    linkLabel: 'Ver el Storybook',
+  },
   {
     name: 'Atlas',
     year: '2026',
