@@ -1,10 +1,10 @@
 'use client';
 
 import { Badge } from '@chroma-yesid/ui';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Accent } from '@/components/ui/DisplayHeading';
 import { Section } from '@/components/ui/Section';
-import { projects } from '@/content/proyectos';
+import { projects, type Project } from '@/content/proyectos';
 
 /** Vista previa que sigue al cursor con inercia (solo con mouse; en pantallas táctiles cada fila muestra su portada). */
 function useFollower() {
@@ -36,6 +36,13 @@ function useFollower() {
   }, []);
 
   return ref;
+}
+
+/** Portada de un proyecto: captura real si la hay (alineada arriba), si no el degradado. */
+function coverStyle(p: Project): CSSProperties {
+  return p.image
+    ? { background: `#0a0a0a url(${p.image}) center top / cover no-repeat` }
+    : { background: p.cover };
 }
 
 export function Projects() {
@@ -89,7 +96,7 @@ export function Projects() {
               <div
                 aria-hidden="true"
                 className="aspect-[16/7] rounded-lg md:hidden"
-                style={{ background: p.cover }}
+                style={coverStyle(p)}
               />
             </div>
           </li>
@@ -106,7 +113,7 @@ export function Projects() {
           <div
             key={p.name}
             className="absolute inset-0 transition-[clip-path] duration-500 ease-in-out"
-            style={{ background: p.cover, clipPath: active === i ? 'inset(0)' : 'inset(100% 0 0 0)', zIndex: active === i ? 2 : 1 }}
+            style={{ ...coverStyle(p), clipPath: active === i ? 'inset(0)' : 'inset(100% 0 0 0)', zIndex: active === i ? 2 : 1 }}
           />
         ))}
       </div>

@@ -14,6 +14,8 @@ export interface Project {
   /** Muestra de ejemplo, no un proyecto real. */
   draft?: boolean;
   url?: string;
+  /** Captura (ruta en /public) que reemplaza al degradado como portada. */
+  image?: string;
   /** Texto del enlace a `url`. */
   linkLabel?: string;
 }
@@ -30,6 +32,17 @@ export const projects: Project[] = [
     cover: 'linear-gradient(135deg, #111110, #c42b00 60%, #ff3b00)',
     url: 'https://chroma-storybook.vercel.app',
     linkLabel: 'Ver el Storybook',
+  },
+  {
+    name: 'Performa Club',
+    year: '2026',
+    category: 'App móvil · Comunidad',
+    type: 'app',
+    stack: 'Expo, React Native, Supabase',
+    description:
+      'App móvil para entusiastas de los carros: garaje, viajes, misiones, ranking y social, con escaneo de vehículos con IA y suscripción premium. Estética oscura estilo cyberpunk.',
+    cover: 'linear-gradient(135deg, #0a0a0a, #00a3b8 60%, #00e5ff)',
+    image: '/proyectos/performa-club/login.jpg',
   },
   {
     name: 'Atlas',
