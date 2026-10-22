@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cuatro lienzos — Portafolio Yesid Carrillo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;700;900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #0e0e0d; --card: #171716; --line: #2a2a28; --ink: #f0eee8; --mute: #8c8a83; --accent: #ff5a1f; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: "Inter Tight", system-ui, sans-serif; }
+  a { color: inherit; }
+  .mono { font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; }
+  header { padding: 64px 24px 40px; max-width: 1400px; margin: 0 auto; }
+  header h1 { font-size: clamp(48px, 8vw, 120px); font-weight: 900; letter-spacing: -.055em; line-height: .88; }
+  header h1 em { font-family: "Instrument Serif"; font-weight: 400; font-style: italic; letter-spacing: -.02em; color: var(--accent); }
+  header p { margin-top: 22px; max-width: 620px; color: var(--mute); font-size: 18px; line-height: 1.45; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; padding: 0 24px 80px; max-width: 1400px; margin: 0 auto; }
+  .opt { background: var(--card); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; transition: border-color .3s, transform .4s cubic-bezier(.2,.8,.2,1); }
+  .opt:hover { border-color: #4a4a46; transform: translateY(-4px); }
+  .preview { position: relative; aspect-ratio: 16/10; overflow: hidden; background: #000; display: block; }
+  .preview iframe { position: absolute; left: 0; top: 0; width: 1440px; height: 900px; border: 0; transform-origin: 0 0; pointer-events: none; }
+  .preview .open { position: absolute; right: 14px; bottom: 14px; background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 99px; font-size: 14px; font-weight: 500; text-decoration: none; opacity: 0; transform: translateY(8px); transition: .3s; }
+  .opt:hover .open { opacity: 1; transform: none; }
+  .body { padding: 22px 24px 26px; display: grid; gap: 16px; }
+  .top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .top h2 { font-size: 34px; font-weight: 700; letter-spacing: -.04em; }
+  .top h2 span { color: var(--mute); font-weight: 400; margin-right: 10px; }
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tags span { border: 1px solid var(--line); border-radius: 99px; padding: 4px 10px; color: var(--mute); }
+  .lede { font-size: 17px; line-height: 1.45; color: #cfcdc6; }
+  h3 { color: var(--mute); margin-bottom: 8px; }
+  ul { list-style: none; display: grid; gap: 6px; font-size: 14px; line-height: 1.4; }
+  ul li::before { content: "→ "; color: var(--accent); }
+  .insp li::before { content: "↗ "; }
+  .insp a { text-decoration: none; border-bottom: 1px solid #4a4a46; }
+  .insp a:hover { border-color: var(--accent); color: #fff; }
+  .insp small { color: var(--mute); }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  footer { padding: 30px 24px 50px; max-width: 1400px; margin: 0 auto; color: var(--mute); border-top: 1px solid var(--line); font-size: 14px; line-height: 1.6; }
+  @media (max-width: 960px) { .grid, .cols { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <p class="mono" style="margin:0 0 18px;color:var(--mute)">Exploración de dirección visual · Octubre 2026</p>
+  <h1>Cuatro lienzos,<br><em>una sola elección.</em></h1>
+  <p>Cuatro direcciones radicalmente distintas para tu portafolio, cada una funcional e interactiva. Ábrelas a pantalla completa, juega con ellas y elige la que más se parezca a ti (o mezclemos piezas).</p>
+  <p><a href="/laboratorio/comparar" style="color:var(--ink);border-bottom:1px solid var(--accent);text-decoration:none">Compararlos lado a lado en el lienzo →</a></p>
+  <p style="margin-top:14px"><a href="/" style="color:var(--mute);text-decoration:none">← Volver al sitio</a></p>
+</header>
+
+<main class="grid" id="grid"></main>
+
+<footer>Inspiración curada desde <a href="https://mobbin.com" target="_blank" rel="noopener">Mobbin</a>. Los diseños toman patrones (layout, interacción, ritmo), no copian marcas ni contenido. Los textos, proyectos y correo son de ejemplo: se reemplazan por los tuyos.</footer>
+
+<script>
+const M = id => 'https://mobbin.com/sites/sections/' + id;
+const options = [
+  {
+    n: '01', name: 'Señal', path: '/laboratorio/senal', tags: ['Oscuro', 'Cinematográfico', 'Tech'],
+    lede: 'Entrada de estudio creativo: precarga con contador, tu nombre con glitch RGB sobre una esfera de 1.700 partículas que reacciona al mouse, y un recorrido horizontal por tus proyectos.',
+    anim: ['Preloader 000→100 con cortinilla', 'Esfera de partículas 3D que respira y sigue al cursor', 'Manifiesto que se ilumina palabra por palabra al hacer scroll', 'Galería horizontal anclada con tarjetas con inclinación 3D', 'Botón magnético + cursor en modo diferencia'],
+    insp: [['Unseen Studio', 'Título con glitch sobre globo wireframe', '64611226-7921-4e34-9001-83c7e91bd803'], ['Squarespace', 'Esfera de partículas en hero', 'c89f9f86-b4f8-4d83-ae11-71ba2fb6f5f3'], ['Grok', 'Destello de luz cálida y tipografía gigante', '6d1d2671-6a8f-4bd9-868d-0f03dab5e519'], ['basement.studio', 'Estética oscura técnica', '28a88d90-f813-478b-bb89-336dbe1e48a0']],
+  },
+  {
+    n: '02', name: 'Índice', path: '/laboratorio/indice', tags: ['Claro', 'Editorial', 'Suizo'],
+    lede: 'Portafolio con alma de revista: tu nombre partido entre una grotesca pesada y una serif delicada, lista de obras gigante estilo cartelera y vistas previas que siguen al cursor.',
+    anim: ['Letras que emergen con rotación escalonada', 'Vista previa flotante con inercia y giro según velocidad', 'Cortinillas que cambian de proyecto al pasar el cursor', 'Contadores animados y reloj de Bogotá en vivo', 'Nombre gigante en el footer, ajustado al ancho, con letras reactivas'],
+    insp: [['Freshman', 'Nombre mezclando sans pesada + serif', 'cc46fe95-d2fb-46a6-927a-96c9bc6d5ecc'], ['A24', 'Lista de títulos enormes con año en superíndice', 'b645a881-adf5-43f3-a86c-758cd54f0b72'], ['Locomotive', 'Índice tabular de proyectos', '280c1a2d-41d4-4495-a4bd-816763c93ad3'], ['Nite Riot', 'Metadatos en mono y reloj en el nav', '1aa05a05-6920-4f35-a581-3dcf42634162']],
+  },
+  {
+    n: '03', name: 'Pestañas', path: '/laboratorio/pestanas', tags: ['Color', 'App-like', 'Lúdico'],
+    lede: 'Tu portafolio como un sistema operativo de colores: pestañas apiladas que se expanden, transiciones de tinta circulares desde el clic y una sección por pantalla, sin scroll.',
+    anim: ['Transición circular de color desde el punto del clic', 'Monograma geométrico con parallax que explota y se rearma', 'Tarjetas de principios que giran en 3D', 'Píldoras del stack arrastrables y flotantes', 'Marquesina de texto pixelado multicolor'],
+    insp: [['Raw Materials', 'Navegación por pestañas de color numeradas', 'e5ec35b6-1d56-4131-a532-b8390ff5373d'], ['Wild', 'Texto pixelado de colores en movimiento', 'b7197fb0-f4c9-4583-8864-d0f5e1c94195'], ['Cloudstudio', 'Grid de trabajo con números y tags', '48890788-7d16-4887-baaa-5b22583ef055'], ['Unseen Studio', 'Filtros por categoría en píldoras', '79d328bc-800b-4830-9de1-7ef8fd2dd00f']],
+  },
+  {
+    n: '04', name: 'Lienzo', path: '/laboratorio/lienzo', tags: ['Infinito', 'Interactivo', 'Juguetón'],
+    lede: 'El más fuera de lo común: tu portafolio es un lienzo infinito tipo Figma. Se navega arrastrando, se hace zoom y todo se puede mover. Incluye un "reclutador" fantasma explorando contigo.',
+    anim: ['Paneo con inercia y zoom hacia el cursor', 'Vuelo de cámara con arco de zoom entre secciones', 'Objetos arrastrables que se inclinan con la velocidad', 'Stickers con ojos que siguen tu cursor', 'Minimapa en vivo + mini-juego de salto con espacio'],
+    insp: [['Superr', 'Cuadernos escolares con etiquetas escritas a mano', '7503f85b-2854-46df-a1bc-db51a8223469'], ['OFF+BRAND', 'Orbe de gradiente y tarjetas flotantes', 'f890a5d7-f914-4f60-8ec2-a15350081db4'], ['MANA Yerba Maté', 'Personaje con "Press Space to jump"', '1bdcc550-68a0-4c2b-b010-473839dbf7bc'], ['Touchy Coffee', 'Anotaciones y trazos a mano alzada', '1262461a-ee8b-472e-9cf1-001b0de70548']],
+  },
+];
+
+document.getElementById('grid').innerHTML = options.map(o => `
+  <article class="opt">
+    <a class="preview" href="${o.path}" target="_blank" rel="noopener">
+      <iframe src="${o.path}" loading="lazy" title="Vista previa ${o.name}" tabindex="-1"></iframe>
+      <span class="open">Abrir a pantalla completa ↗</span>
+    </a>
+    <div class="body">
+      <div class="top"><h2><span>${o.n}</span>${o.name}</h2><div class="tags mono">${o.tags.map(t => `<span>${t}</span>`).join('')}</div></div>
+      <p class="lede">${o.lede}</p>
+      <div class="cols">
+        <div><h3 class="mono">Animaciones clave</h3><ul>${o.anim.map(a => `<li>${a}</li>`).join('')}</ul></div>
+        <div><h3 class="mono">Inspiración (Mobbin)</h3><ul class="insp">${o.insp.map(i => `<li><a href="${M(i[2])}" target="_blank" rel="noopener">${i[0]}</a><br><small>${i[1]}</small></li>`).join('')}</ul></div>
+      </div>
+    </div>
+  </article>`).join('');
+
+const scale = () => document.querySelectorAll('.preview').forEach(p => p.querySelector('iframe').style.transform = `scale(${p.clientWidth / 1440})`);
+scale(); addEventListener('resize', scale);
+</script>
+</body>
+</html>

@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Lienzo — Yesid Carrillo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&family=Caveat:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f3ee;
+    --dot: #d6d0c4;
+    --ink: #1a1a1a;
+    --mute: #7d776c;
+    --blue: #3b6cff;
+    --pink: #ff8fb8;
+    --yellow: #ffd84a;
+    --sky: #a9d8ff;
+    --orange: #ff6a2b;
+    --panel: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  h1, h2, h3, h4 { text-wrap: balance; hyphens: manual; overflow-wrap: normal; }
+  html, body { height: 100%; overflow: hidden; }
+  body { background: var(--bg); color: var(--ink); font-family: "Inter", system-ui, sans-serif; overscroll-behavior: none; }
+  .hand { font-family: "Caveat", cursive; }
+  .serif { font-family: "Fraunces", serif; }
+
+  #viewport { position: fixed; inset: 0; cursor: grab; touch-action: none; background-image: radial-gradient(var(--dot) 1.2px, transparent 1.4px); }
+  #viewport.panning { cursor: grabbing; }
+  #world { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
+  .item { position: absolute; user-select: none; -webkit-user-select: none; cursor: grab; }
+  .item .lift { transition: transform .35s cubic-bezier(.34,1.56,.64,1), box-shadow .35s, rotate .2s; transform: scale(0); }
+  .item.in .lift { transform: scale(1); }
+  .item.drag { z-index: 100; cursor: grabbing; }
+  .item.drag .lift { transform: scale(1.05); box-shadow: 0 30px 60px -20px rgba(0,0,0,.35); }
+  .no-lift .lift { box-shadow: none !important; }
+
+  /* hero card */
+  .hero-card { width: 680px; padding: 34px 40px 36px; background: var(--panel); border-radius: 22px; box-shadow: 0 1px 0 rgba(0,0,0,.05), 0 20px 50px -30px rgba(0,0,0,.25); }
+  .hero-card .hand { font-size: 34px; color: var(--orange); }
+  .hero-card h1 { font-family: "Fraunces"; font-weight: 300; font-size: 104px; line-height: .9; letter-spacing: -.04em; }
+  .hero-card h1 i { font-style: italic; }
+  .hero-card p { margin-top: 18px; font-size: 18px; color: var(--mute); max-width: 460px; line-height: 1.4; }
+  .badges { display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
+  .badges span { font-size: 13px; padding: 6px 12px; border-radius: 99px; border: 1px solid #e3ddd2; }
+  .badges .live::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #2fd36a; margin-right: 6px; box-shadow: 0 0 0 0 #2fd36a; animation: ping 1.6s infinite; }
+  @keyframes ping { 70% { box-shadow: 0 0 0 7px transparent; } }
+
+  /* orb */
+  .orb { width: 440px; height: 440px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff4c9, #ffb0c8 35%, #ff7a3d 65%, #ffcf4a 90%); filter: blur(.5px); animation: morph 9s ease-in-out infinite alternate; }
+  .orb::after { content: ""; position: absolute; width: 90px; height: 90px; left: 26%; top: 56%; border-radius: 50%; background: radial-gradient(circle at 40% 40%, #fff, #c9c1b5); box-shadow: inset -8px -8px 20px rgba(0,0,0,.15); }
+  @keyframes morph { 0% { border-radius: 50%; } 50% { border-radius: 58% 42% 46% 54% / 48% 60% 40% 52%; } 100% { border-radius: 44% 56% 60% 40% / 56% 44% 56% 44%; } }
+
+  /* notebooks */
+  .nb { width: 270px; height: 350px; border-radius: 10px 18px 18px 10px; position: relative; padding: 0; overflow: hidden; box-shadow: inset 14px 0 0 rgba(0,0,0,.08), 0 18px 40px -24px rgba(0,0,0,.4); }
+  .nb .label { position: absolute; left: 26px; right: 22px; top: 74px; background: #fff; border-radius: 6px; border: 2px solid var(--ink); font-size: 12px; }
+  .nb .label .row1 { padding: 6px 10px; border-bottom: 2px solid var(--ink); }
+  .nb .label .row1 small { display: block; color: var(--mute); }
+  .nb .label .row1 b { font-family: "Caveat"; font-size: 34px; font-weight: 700; line-height: 1; }
+  .nb .label .row2 { display: grid; grid-template-columns: 1fr 1fr; }
+  .nb .label .row2 span { padding: 6px 10px; }
+  .nb .label .row2 span + span { border-left: 2px solid var(--ink); }
+  .nb .label .row2 b { font-family: "Caveat"; font-size: 20px; display: block; }
+  .nb .foot { position: absolute; bottom: 18px; left: 26px; right: 20px; display: flex; justify-content: space-between; font-size: 12px; }
+  .clouds { background: radial-gradient(circle at 20% 20%, #fff 0 22px, transparent 23px), radial-gradient(circle at 34% 18%, #fff 0 28px, transparent 29px), radial-gradient(circle at 70% 70%, #fff 0 24px, transparent 25px), radial-gradient(circle at 84% 68%, #fff 0 30px, transparent 31px), radial-gradient(circle at 30% 92%, #fff 0 26px, transparent 27px), var(--sky); }
+  .grid-paper { background: linear-gradient(#0000 23px, #ff6a2b33 24px) 0 0/24px 24px, linear-gradient(90deg, #0000 23px, #ff6a2b33 24px) 0 0/24px 24px, #fff1e6; }
+  .stripes { background: repeating-linear-gradient(-45deg, var(--yellow) 0 18px, #ffe78f 18px 36px); }
+  .pinky { background: var(--pink); }
+
+  /* stickers */
+  .blob { width: 120px; height: 110px; display: grid; place-items: center; }
+  .blob .body { position: absolute; inset: 0; border-radius: 46% 54% 50% 50% / 55% 50% 50% 45%; }
+  .eyes { position: relative; display: flex; gap: 10px; margin-top: -10px; }
+  .eye { width: 26px; height: 30px; background: #fff; border-radius: 50%; border: 3px solid var(--ink); display: grid; place-items: center; }
+  .pupil { width: 11px; height: 11px; background: var(--ink); border-radius: 50%; }
+  .flower { width: 120px; height: 120px; }
+  .flower .body { position: absolute; inset: 0; background:
+    radial-gradient(circle at 50% 18%, var(--blue) 0 26px, transparent 27px),
+    radial-gradient(circle at 18% 45%, var(--blue) 0 26px, transparent 27px),
+    radial-gradient(circle at 82% 45%, var(--blue) 0 26px, transparent 27px),
+    radial-gradient(circle at 32% 82%, var(--blue) 0 26px, transparent 27px),
+    radial-gradient(circle at 68% 82%, var(--blue) 0 26px, transparent 27px),
+    radial-gradient(circle at 50% 52%, var(--blue) 0 34px, transparent 35px); }
+
+  /* polaroid */
+  .polaroid { width: 250px; background: #fff; padding: 14px 14px 46px; box-shadow: 0 16px 34px -20px rgba(0,0,0,.4); }
+  .polaroid .ph { aspect-ratio: 1; background: linear-gradient(160deg, #3a3a38, #8b857a); display: grid; place-items: center; color: #fff9; font-size: 12px; letter-spacing: .1em; }
+  .polaroid .hand { position: absolute; bottom: 8px; left: 0; right: 0; text-align: center; font-size: 26px; }
+  .tape { position: absolute; top: -14px; left: 50%; width: 110px; height: 30px; margin-left: -55px; background: #ffd84acc; rotate: -4deg; }
+
+  /* notes */
+  .note { width: 280px; min-height: 260px; padding: 26px; background: var(--yellow); box-shadow: 0 22px 30px -22px rgba(0,0,0,.45); font-family: "Caveat"; font-size: 34px; line-height: 1.05; }
+  .note a { color: var(--ink); display: inline-block; margin-top: 16px; font-size: 28px; border-bottom: 2px solid; }
+  .annot { font-size: 30px; color: var(--mute); pointer-events: none; white-space: nowrap; }
+  .annot svg { display: block; }
+  .h-section { font-family: "Fraunces"; font-weight: 300; font-size: 70px; letter-spacing: -.03em; pointer-events: none; white-space: nowrap; }
+  .h-section i { color: var(--orange); }
+
+  /* about + layers */
+  .about { width: 480px; background: var(--panel); border-radius: 18px; padding: 30px; font-size: 20px; line-height: 1.45; }
+  .about b { font-weight: 600; background: linear-gradient(transparent 60%, #ffd84a99 60%); }
+  .layers { width: 300px; background: #2a2a2a; color: #e8e8e8; border-radius: 12px; font-size: 13px; overflow: hidden; }
+  .layers header { padding: 12px 14px; border-bottom: 1px solid #3d3d3d; display: flex; justify-content: space-between; color: #9a9a9a; }
+  .layers li { list-style: none; padding: 8px 14px; display: flex; gap: 10px; align-items: center; }
+  .layers li:hover { background: #3b6cff; }
+  .layers li i { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+
+  /* jumper */
+  .jumper { width: 380px; height: 200px; }
+  .jumper .ground { position: absolute; left: 0; right: 0; bottom: 30px; height: 2px; background: var(--ink); }
+  .jumper .guy { position: absolute; left: 150px; bottom: 32px; width: 70px; height: 80px; }
+  .jumper .guy .body { position: absolute; inset: 0; background: var(--orange); border-radius: 40% 40% 30% 30%; }
+  .jumper .guy .eyes { position: absolute; left: 12px; top: 18px; gap: 6px; }
+  .jumper .guy .eye { width: 18px; height: 20px; border-width: 2px; }
+  .jumper .guy .pupil { width: 7px; height: 7px; }
+  .jumper .guy.jump { animation: jump .7s cubic-bezier(.3,.9,.4,1); }
+  @keyframes jump { 0% { transform: scale(1.15,.85); } 40% { transform: translateY(-110px) scale(.9,1.1) rotate(-12deg); } 75% { transform: translateY(0) scale(1.15,.85); } 100% { transform: none; } }
+  .jumper button { position: absolute; left: 50%; bottom: -14px; transform: translateX(-50%); font: 600 15px "Inter"; padding: 10px 18px; background: var(--yellow); border: 2px solid var(--ink); border-radius: 10px; box-shadow: 0 4px 0 var(--ink); cursor: pointer; white-space: nowrap; }
+  .jumper button:active { transform: translate(-50%, 3px); box-shadow: 0 1px 0 var(--ink); }
+  .score { position: absolute; right: 0; top: 0; font-family: "Caveat"; font-size: 26px; }
+
+  /* fake collaborator cursor */
+  .ghost { position: absolute; left: 0; top: 0; pointer-events: none; z-index: 200; }
+  .ghost span { position: absolute; left: 14px; top: 16px; background: #8a3bff; color: #fff; font-size: 12px; padding: 3px 8px; border-radius: 4px 10px 10px 10px; white-space: nowrap; }
+
+  /* chrome */
+  .topbar { position: fixed; top: 14px; left: 14px; right: 14px; display: flex; justify-content: space-between; pointer-events: none; z-index: 10; }
+  .topbar > * { pointer-events: auto; background: var(--panel); border-radius: 12px; padding: 10px 14px; font-size: 13px; box-shadow: 0 6px 20px -12px rgba(0,0,0,.3); display: flex; gap: 10px; align-items: center; }
+  .avatars { display: flex; }
+  .avatars i { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #fff; margin-left: -6px; display: grid; place-items: center; font-style: normal; font-size: 10px; color: #fff; }
+  .toolbar { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff; border-radius: 14px; padding: 6px; display: flex; gap: 4px; z-index: 10; box-shadow: 0 16px 40px -16px rgba(0,0,0,.5); }
+  .toolbar button { background: none; border: none; color: inherit; font: 500 13px "Inter"; padding: 9px 12px; border-radius: 9px; cursor: pointer; white-space: nowrap; }
+  .toolbar button:hover, .toolbar button.on { background: #ffffff1f; }
+  .toolbar .sep { width: 1px; background: #ffffff2a; margin: 6px 2px; }
+  #zoomLabel { min-width: 54px; }
+  #minimap { position: fixed; right: 16px; bottom: 16px; width: 180px; height: 116px; background: var(--panel); border-radius: 12px; box-shadow: 0 10px 30px -14px rgba(0,0,0,.35); z-index: 10; cursor: pointer; }
+  .help { position: fixed; left: 16px; bottom: 16px; font-size: 12px; color: var(--mute); z-index: 10; line-height: 1.6; }
+  @media (max-width: 760px) { #minimap, .help, .topbar .right { display: none; } .toolbar button { padding: 8px 9px; font-size: 12px; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div id="viewport"><div id="world"></div></div>
+
+<div class="topbar">
+  <div><b>◆</b> Archivo / <b>yesid-portafolio</b> <span style="color:var(--mute)">— editado ahora</span></div>
+  <div class="right"><div class="avatars"><i style="background:#ff6a2b">YC</i><i style="background:#8a3bff">TÚ</i><i style="background:#2fd36a">+3</i></div>Compartir</div>
+</div>
+
+<nav class="toolbar" id="toolbar">
+  <button data-go="inicio" class="on">Inicio</button>
+  <button data-go="proyectos">Proyectos</button>
+  <button data-go="sobre">Sobre mí</button>
+  <button data-go="contacto">Contacto</button>
+  <span class="sep"></span>
+  <button id="zout" aria-label="Alejar">−</button>
+  <button id="zoomLabel">100%</button>
+  <button id="zin" aria-label="Acercar">+</button>
+</nav>
+<canvas id="minimap"></canvas>
+<div class="help">Arrastra para moverte · arrastra objetos · Ctrl/⌘ + rueda para zoom</div>
+
+<script>
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const world = document.getElementById('world'), vp = document.getElementById('viewport');
+
+/* ------------ Items (world coords, top-left) ------------ */
+const projects = [
+  ['Atlas', 'SaaS', '2026', 'clouds'], ['Nébula', 'Fintech', '2025', 'pinky'],
+  ['Eco', 'IA', '2026', 'grid-paper'], ['Kiosko', 'E-comm', '2025', 'stripes'],
+];
+const eyes = '<div class="eyes"><div class="eye"><div class="pupil"></div></div><div class="eye"><div class="pupil"></div></div></div>';
+const items = [
+  { x: -900, y: -560, r: 0, cls: 'no-lift', html: '<div class="orb"></div>' },
+  { x: -340, y: -170, r: 0, html: `<div class="hero-card"><div class="hand">¡Hola! soy</div><h1>Yesid <i>Carrillo</i></h1><p>Desarrollador full-stack. Diseño y construyo productos web, mobile y con IA que la gente disfruta usar.</p><div class="badges"><span class="live">Disponible 2026</span><span>Bogotá, CO</span><span>ES / EN</span></div></div>` },
+  { x: 360, y: -250, r: -10, html: '', annot: true, raw: `<div class="annot hand">arrástrame, no muerdo<svg width="120" height="60" viewBox="0 0 120 60"><path d="M10 6 C 40 50, 80 50, 110 30" fill="none" stroke="#7d776c" stroke-width="2.5"/><path d="M98 22 L110 30 L96 38" fill="none" stroke="#7d776c" stroke-width="2.5"/></svg></div>` },
+  { x: 380, y: -380, r: 8, html: `<div class="blob"><div class="body" style="background:var(--blue)"></div>${eyes}</div>` },
+  { x: -230, y: 250, r: -6, html: `<div class="blob"><div class="body" style="background:var(--orange);border-radius:30%"></div>${eyes}</div>` },
+  { x: -780, y: 30, r: -6, html: `<div class="polaroid"><div class="tape"></div><div class="ph">TU FOTO</div><div class="hand">yo, programando</div></div>` },
+  { x: 760, y: -470, r: 0, html: '', raw: `<div class="h-section">Proyectos <i>↓</i></div>` },
+  ...projects.map((p, i) => ({
+    x: 740 + (i % 2) * 320, y: -340 + Math.floor(i / 2) * 400, r: [-4, 3, 2, -3][i],
+    html: `<div class="nb ${p[3]}"><div class="label"><div class="row1"><small>Proyecto</small><b>${p[0]}</b></div><div class="row2"><span><small>Tipo</small><b>${p[1]}</b></span><span><small>Año</small><b>${p[2]}</b></span></div></div><div class="foot"><span>Caso de estudio</span><span>↗</span></div></div>`,
+  })),
+  { x: 1380, y: -120, r: 12, html: `<div class="flower blob"><div class="body"></div>${eyes}</div>` },
+  { x: -1560, y: -330, r: 0, raw: `<div class="h-section">Sobre <i>mí</i></div>` },
+  { x: -1560, y: -220, r: -1, html: `<div class="about">Llevo <b>6 años</b> convirtiendo ideas en software. Me muevo cómodo entre <b>Figma y la terminal</b>, y creo que el movimiento bien usado es lo que separa un producto correcto de uno <b>memorable</b>.</div>` },
+  { x: -1500, y: 150, r: 2, html: `<div class="layers"><header><span>Capas — Stack</span><span>12</span></header><ul>${[['React', '#61dafb'], ['Next.js', '#fff'], ['TypeScript', '#3178c6'], ['Node', '#5fa04e'], ['Supabase', '#3ecf8e'], ['Three.js', '#ff6a2b'], ['Claude API', '#d97757'], ['Figma', '#a259ff']].map(l => `<li><i style="background:${l[1]}"></i>${l[0]}</li>`).join('')}</ul></div>` },
+  { x: -1000, y: 520, r: 0, raw: `<div class="h-section">Contacto <i>→</i></div>` },
+  { x: -180, y: 560, r: -3, html: `<div class="note">¿Tienes una idea loca? Me encantan.<br>Escríbeme y la hacemos realidad.<a href="mailto:hola@tudominio.com" data-click>hola@tudominio.com</a></div>` },
+  { x: 260, y: 600, r: 0, cls: 'no-lift', html: `<div class="jumper"><span class="score" id="score">saltos: 0</span><div class="ground"></div><div class="guy" id="guy"><div class="body"></div>${eyes}</div><button data-click id="jumpBtn">Pulsa espacio para saltar</button></div>` },
+];
+
+items.forEach((it, i) => {
+  const el = document.createElement('div');
+  el.className = 'item ' + (it.cls || '');
+  el.style.left = it.x + 'px'; el.style.top = it.y + 'px';
+  el.innerHTML = it.raw ? it.raw : `<div class="lift" style="rotate:${it.r}deg">${it.html}</div>`;
+  if (it.raw) el.style.pointerEvents = 'none';
+  world.appendChild(el);
+  it.el = el;
+  setTimeout(() => el.classList.add('in'), reduce ? 0 : 300 + i * 70);
+});
+
+/* ------------ Camera ------------ */
+const cam = { x: innerWidth / 2, y: innerHeight / 2, z: innerWidth < 760 ? .5 : .9 };
+const zoomLabel = document.getElementById('zoomLabel');
+function apply() {
+  world.style.transform = `translate(${cam.x}px, ${cam.y}px) scale(${cam.z})`;
+  const g = 24 * cam.z;
+  vp.style.backgroundSize = `${g}px ${g}px`;
+  vp.style.backgroundPosition = `${cam.x}px ${cam.y}px`;
+  zoomLabel.textContent = Math.round(cam.z * 100) + '%';
+  drawMini();
+}
+const clampZ = z => Math.min(2.5, Math.max(.2, z));
+function zoomAt(sx, sy, nz) {
+  nz = clampZ(nz);
+  const wx = (sx - cam.x) / cam.z, wy = (sy - cam.y) / cam.z;
+  cam.z = nz; cam.x = sx - wx * nz; cam.y = sy - wy * nz; apply();
+}
+let flyRaf;
+function flyTo(wx, wy, z) {
+  cancelAnimationFrame(flyRaf); vel.x = vel.y = 0;
+  const from = { ...cam }, to = { z, x: innerWidth / 2 - wx * z, y: innerHeight / 2 - wy * z };
+  const t0 = performance.now(), dur = reduce ? 1 : 1100;
+  const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const step = now => {
+    const k = Math.min(1, (now - t0) / dur), e = ease(k);
+    // slight zoom-out arc in the middle of the flight, like Figma/Prezi
+    const dip = Math.sin(Math.PI * e) * .25 * Math.min(from.z, to.z);
+    cam.z = from.z + (to.z - from.z) * e - dip;
+    const cxW = (innerWidth / 2 - from.x) / from.z + (wx - (innerWidth / 2 - from.x) / from.z) * e;
+    const cyW = (innerHeight / 2 - from.y) / from.z + (wy - (innerHeight / 2 - from.y) / from.z) * e;
+    cam.x = innerWidth / 2 - cxW * cam.z; cam.y = innerHeight / 2 - cyW * cam.z;
+    apply(); if (k < 1) flyRaf = requestAnimationFrame(step);
+  };
+  flyRaf = requestAnimationFrame(step);
+}
+const spots = { inicio: [0, 40, 1], proyectos: [1060, 0, .8], sobre: [-1280, 20, .9], contacto: [140, 700, .9] };
+const mobileZ = innerWidth < 760 ? .55 : 1;
+document.getElementById('toolbar').addEventListener('click', e => {
+  const b = e.target.closest('[data-go]'); if (!b) return;
+  document.querySelectorAll('[data-go]').forEach(x => x.classList.toggle('on', x === b));
+  const s = spots[b.dataset.go]; flyTo(s[0], s[1], s[2] * mobileZ);
+});
+document.getElementById('zin').onclick = () => zoomAt(innerWidth / 2, innerHeight / 2, cam.z * 1.25);
+document.getElementById('zout').onclick = () => zoomAt(innerWidth / 2, innerHeight / 2, cam.z / 1.25);
+zoomLabel.onclick = () => zoomAt(innerWidth / 2, innerHeight / 2, 1);
+
+vp.addEventListener('wheel', e => {
+  e.preventDefault(); cancelAnimationFrame(flyRaf);
+  if (e.ctrlKey || e.metaKey) zoomAt(e.clientX, e.clientY, cam.z * Math.exp(-e.deltaY * .01));
+  else { cam.x -= e.deltaX; cam.y -= e.deltaY; apply(); }
+}, { passive: false });
+
+/* ------------ Pan + item drag with inertia ------------ */
+const vel = { x: 0, y: 0 };
+let mode = null, last = null, dragItem = null, moved = 0;
+vp.addEventListener('pointerdown', e => {
+  if (e.target.closest('[data-click]')) return;
+  cancelAnimationFrame(flyRaf);
+  const itemEl = e.target.closest('.item');
+  mode = itemEl ? 'item' : 'pan'; dragItem = itemEl; moved = 0;
+  last = { x: e.clientX, y: e.clientY, t: performance.now() };
+  vp.setPointerCapture(e.pointerId);
+  if (mode === 'pan') vp.classList.add('panning');
+  else { dragItem.classList.add('drag'); world.appendChild(dragItem); }
+});
+vp.addEventListener('pointermove', e => {
+  if (!mode) return;
+  const dx = e.clientX - last.x, dy = e.clientY - last.y, now = performance.now();
+  moved += Math.abs(dx) + Math.abs(dy);
+  if (mode === 'pan') {
+    cam.x += dx; cam.y += dy;
+    const k = 16 / Math.max(16, now - last.t), cap = v => Math.max(-25, Math.min(25, v * k));
+    vel.x = cap(dx); vel.y = cap(dy); apply();
+  }
+  else {
+    dragItem.style.left = (parseFloat(dragItem.style.left) + dx / cam.z) + 'px';
+    dragItem.style.top = (parseFloat(dragItem.style.top) + dy / cam.z) + 'px';
+    const lift = dragItem.querySelector('.lift');
+    if (lift) lift.style.transform = `scale(1.05) rotate(${Math.max(-10, Math.min(10, dx * .8))}deg)`;
+    drawMini();
+  }
+  last = { x: e.clientX, y: e.clientY, t: now };
+});
+const end = () => {
+  if (mode === 'pan') {
+    vp.classList.remove('panning');
+    const glide = () => { vel.x *= .9; vel.y *= .9; cam.x += vel.x; cam.y += vel.y; apply(); if (Math.abs(vel.x) + Math.abs(vel.y) > .3) flyRaf = requestAnimationFrame(glide); };
+    // no glide when the pointer rested before release
+    if (!reduce && performance.now() - last.t < 80) flyRaf = requestAnimationFrame(glide);
+  } else if (mode === 'item') {
+    dragItem.classList.remove('drag');
+    const lift = dragItem.querySelector('.lift'); if (lift) lift.style.transform = '';
+  }
+  mode = null;
+};
+vp.addEventListener('pointerup', end); vp.addEventListener('pointercancel', end);
+
+/* ------------ Minimap ------------ */
+const mini = document.getElementById('minimap'), mctx = mini.getContext('2d');
+const B = { x: -1700, y: -700, w: 3300, h: 1500 };
+function drawMini() {
+  const dpr = Math.min(devicePixelRatio, 2), W = 180, H = 116;
+  if (mini.width !== W * dpr) { mini.width = W * dpr; mini.height = H * dpr; }
+  mctx.setTransform(dpr, 0, 0, dpr, 0, 0); mctx.clearRect(0, 0, W, H);
+  const s = Math.min((W - 16) / B.w, (H - 16) / B.h), ox = 8 - B.x * s, oy = 8 - B.y * s;
+  mctx.fillStyle = '#d6d0c4';
+  items.forEach(it => { const el = it.el; mctx.fillRect(ox + parseFloat(el.style.left) * s, oy + parseFloat(el.style.top) * s, Math.max(3, el.offsetWidth * s), Math.max(3, el.offsetHeight * s)); });
+  mctx.strokeStyle = '#3b6cff'; mctx.lineWidth = 1.5;
+  mctx.strokeRect(ox + (-cam.x / cam.z) * s, oy + (-cam.y / cam.z) * s, innerWidth / cam.z * s, innerHeight / cam.z * s);
+  mini._map = { s, ox, oy };
+}
+mini.addEventListener('click', e => {
+  const r = mini.getBoundingClientRect(), m = mini._map;
+  flyTo((e.clientX - r.left - m.ox) / m.s, (e.clientY - r.top - m.oy) / m.s, cam.z);
+});
+
+/* ------------ Eyes follow the cursor ------------ */
+let mx = 0, my = 0;
+addEventListener('pointermove', e => { mx = e.clientX; my = e.clientY; });
+(function eyesLoop() {
+  document.querySelectorAll('.eye').forEach(eye => {
+    const r = eye.getBoundingClientRect(), a = Math.atan2(my - (r.top + r.height / 2), mx - (r.left + r.width / 2));
+    const d = Math.min(1, Math.hypot(mx - r.left, my - r.top) / 200) * r.width * .22;
+    eye.firstElementChild.style.transform = `translate(${Math.cos(a) * d}px, ${Math.sin(a) * d}px)`;
+  });
+  requestAnimationFrame(eyesLoop);
+})();
+
+/* ------------ Jumper mini-game ------------ */
+const guy = document.getElementById('guy'), score = document.getElementById('score');
+let jumps = 0;
+const jump = () => { if (guy.classList.contains('jump')) return; guy.classList.add('jump'); score.textContent = 'saltos: ' + (++jumps); };
+guy.addEventListener('animationend', () => guy.classList.remove('jump'));
+document.getElementById('jumpBtn').addEventListener('click', jump);
+addEventListener('keydown', e => { if (e.code === 'Space') { e.preventDefault(); jump(); } });
+
+/* ------------ Fake collaborator cursor ------------ */
+const ghost = document.createElement('div');
+ghost.className = 'ghost';
+ghost.innerHTML = '<svg width="18" height="20" viewBox="0 0 18 20"><path d="M1 1 L16 9 L9 11 L6 18 Z" fill="#8a3bff" stroke="#fff" stroke-width="1.5"/></svg><span>Reclutador 👀</span>';
+world.appendChild(ghost);
+const path = [[200, -100], [900, -260], [1150, 180], [600, 60], [-500, 200], [-1300, -100], [-200, 640], [300, -60]];
+let gi = 0, gx = 0, gy = 0, pause = 0;
+(function ghostLoop() {
+  const [tx, ty] = path[gi];
+  if (pause > 0) pause--;
+  else { gx += (tx - gx) * .012; gy += (ty - gy) * .012; if (Math.hypot(tx - gx, ty - gy) < 8) { gi = (gi + 1) % path.length; pause = 90; } }
+  ghost.style.transform = `translate(${gx}px, ${gy}px)`;
+  requestAnimationFrame(ghostLoop);
+})();
+
+addEventListener('resize', apply);
+apply();
+if (!reduce) { const z = cam.z; cam.z = z * .6; apply(); setTimeout(() => flyTo(0, 40, z), 200); }
+</script>
+</body>
+</html>

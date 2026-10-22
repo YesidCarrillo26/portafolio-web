@@ -1,0 +1,175 @@
+/* Capa de marca sobre @chroma-yesid: paleta "Índice" (editorial), tipografía fluida y reglas anti-corte.
+   Regla del sistema: lo nuevo se agrega como token (nombre por rol, valor claro y oscuro), no como valor suelto. */
+
+/* Paleta. Claro por defecto; oscuro con data-theme="dark" (next-themes). */
+:root,
+[data-theme='light'] {
+  --ds-background: #f1eee7;
+  --ds-foreground: #111110;
+  --ds-muted-foreground: #5f5b52; /* 5,9:1 sobre el fondo: pasa AA en texto pequeño */
+  --ds-card: #f8f6f1;
+  --ds-card-foreground: #111110;
+  --ds-popover: #f8f6f1;
+  --ds-popover-foreground: #111110;
+  --ds-primary: #111110;
+  --ds-primary-foreground: #f1eee7;
+  --ds-primary-subtle: #e6e1d6;
+  --ds-primary-subtle-foreground: #111110;
+  --ds-secondary: #e6e1d6;
+  --ds-secondary-foreground: #111110;
+  --ds-accent: #e6e1d6;
+  --ds-accent-foreground: #111110;
+  --ds-border: #d3cdbf;
+  --ds-input: #b9b2a0;
+  --ds-ring: #c42b00;
+  --ds-muted: #e6e1d6;
+  /* Acento de marca: `brand` es para texto (AA); `brand-fill` es decorativo y de relleno grande. */
+  --ds-brand: #c42b00;
+  --ds-brand-fill: #ff3b00;
+}
+
+[data-theme='dark'] {
+  --ds-background: #111110;
+  --ds-foreground: #f1eee7;
+  --ds-muted-foreground: #a8a396;
+  --ds-card: #1a1a18;
+  --ds-card-foreground: #f1eee7;
+  --ds-popover: #1a1a18;
+  --ds-popover-foreground: #f1eee7;
+  --ds-primary: #f1eee7;
+  --ds-primary-foreground: #111110;
+  --ds-primary-subtle: #262522;
+  --ds-primary-subtle-foreground: #f1eee7;
+  --ds-secondary: #262522;
+  --ds-secondary-foreground: #f1eee7;
+  --ds-accent: #262522;
+  --ds-accent-foreground: #f1eee7;
+  --ds-border: #34322d;
+  --ds-input: #4a473f;
+  --ds-ring: #ff6a3d;
+  --ds-muted: #262522;
+  --ds-brand: #ff6a3d;
+  --ds-brand-fill: #ff3b00;
+}
+
+@theme inline {
+  --color-brand: var(--ds-brand);
+  --color-brand-fill: var(--ds-brand-fill);
+
+  /* Fuentes cargadas con next/font en app/layout.tsx. */
+  --font-sans: var(--font-inter-tight), Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: var(--font-instrument-serif), ui-serif, Georgia, serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+@theme {
+  /* Tamaños fluidos que la escala de Chroma no tiene (su tope, `display`, es 36px).
+     Los topes están pensados para que ninguna palabra del título se parta en 320px. */
+  --text-hero: clamp(2.5rem, 1.4rem + 5.2vw, 6.5rem);
+  --text-hero--line-height: 0.98;
+  --text-hero--letter-spacing: -0.045em;
+  --text-display-xl: clamp(2rem, 1.2rem + 3.4vw, 4.25rem);
+  --text-display-xl--line-height: 1.02;
+  --text-display-xl--letter-spacing: -0.035em;
+  --text-price: clamp(1.75rem, 1rem + 2vw, 2.5rem);
+  --text-price--line-height: 1.1;
+  --text-price--letter-spacing: -0.03em;
+  --text-lead: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+  --text-lead--line-height: 1.45;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem; /* el header es fijo */
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Nunca partir una palabra por la mitad: los títulos se equilibran y los párrafos evitan huérfanas. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+    hyphens: manual;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  p,
+  li,
+  dd {
+    text-wrap: pretty;
+    hyphens: manual;
+    overflow-wrap: normal;
+  }
+
+  ::selection {
+    background: var(--ds-brand-fill);
+    color: #fff;
+  }
+}
+
+/* Parche para @chroma-yesid/ui 0.3.0: en web, el cuerpo de SelectableCardGroup (título + descripción) queda en fila
+   porque le falta `flex-col` (en native el flex ya es columna). Quitar cuando el design system lo corrija. */
+fieldset > label > span.w-full > span.flex-1 {
+  flex-direction: column;
+}
+
+/* Marquesina (franja bajo el hero). Con prefers-reduced-motion, el CSS de Chroma la detiene. */
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@utility animate-marquee {
+  animation: marquee 38s linear infinite;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility animate-rise {
+  animation: rise 0.9s var(--ease-standard) both;
+}
+
+/* Revelado al hacer scroll (componente Reveal): sin JS el contenido se ve igual; solo lo que está
+   debajo del pliegue se oculta tras montar, así que no hay parpadeo. */
+[data-reveal] {
+  transition:
+    opacity 0.8s var(--ease-standard),
+    transform 0.8s var(--ease-standard);
+}
+
+[data-reveal='hidden'] {
+  opacity: 0;
+  transform: translateY(1.5rem);
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--r, 0deg));
+  }
+  50% {
+    transform: translateY(-0.75rem) rotate(var(--r, 0deg));
+  }
+}
+
+@utility animate-float {
+  animation: float 7s ease-in-out infinite;
+}

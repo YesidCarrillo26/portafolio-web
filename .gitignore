@@ -1,0 +1,22 @@
+# dependencias y build
+node_modules
+.next
+out
+*.tsbuildinfo
+next-env.d.ts
+
+# entorno y despliegue local
+.env*
+.vercel
+
+# privado: análisis comercial y tarifa interna (el repo es público)
+negocio/
+
+# capturas de Mobbin (sitios de terceros): solo copia local
+inspiracion/
+
+# local
+.DS_Store
+.claude/settings.local.json
+test-results
+playwright-report

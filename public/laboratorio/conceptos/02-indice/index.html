@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Índice — Yesid Carrillo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;800;900&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f1eee7;
+    --ink: #111110;
+    --mute: #8b877d;
+    --rule: #d8d3c8;
+    --accent: #ff3b00;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  h1, h2, h3, h4 { text-wrap: balance; hyphens: manual; overflow-wrap: normal; }
+  body { background: var(--paper); color: var(--ink); font-family: "Inter Tight", system-ui, sans-serif; overflow-x: hidden; }
+  a { color: inherit; text-decoration: none; }
+  .mono { font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; }
+  .serif { font-family: "Instrument Serif", serif; font-weight: 400; }
+  ::selection { background: var(--accent); color: var(--paper); }
+
+  /* Nav */
+  nav { position: fixed; inset: 0 0 auto 0; z-index: 40; display: grid; grid-template-columns: 1fr 1fr 1fr; padding: 18px 24px; align-items: center; color: #fff; mix-blend-mode: difference; }
+  nav .c { text-align: center; } nav .r { text-align: right; }
+  nav a { display: inline-block; overflow: hidden; height: 1.2em; vertical-align: top; }
+  nav a span { display: block; transition: transform .45s cubic-bezier(.7,0,.2,1); }
+  nav a span::after { content: attr(data-t); display: block; color: var(--accent); }
+  nav a:hover span { transform: translateY(-100%); }
+  .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); margin-right: 6px; animation: blink 1.4s infinite; }
+  @keyframes blink { 50% { opacity: .2; } }
+
+  /* Hero */
+  .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 90px 24px 40px; text-align: center; position: relative; }
+  .hero .eyebrow { margin-bottom: 18px; color: var(--mute); }
+  .big { font-weight: 900; font-size: clamp(72px, 16.5vw, 270px); line-height: .8; letter-spacing: -.065em; text-transform: uppercase; }
+  .big-serif { font-size: clamp(78px, 18vw, 300px); line-height: .82; letter-spacing: -.035em; }
+  .split { display: inline-block; overflow: hidden; vertical-align: bottom; }
+  .split > i { display: inline-block; font-style: inherit; transform: translateY(105%) rotate(6deg); transition: transform 1.1s cubic-bezier(.19,1,.22,1); }
+  .in .split > i { transform: none; }
+  .hero-row { display: flex; align-items: center; justify-content: center; gap: clamp(12px, 2vw, 32px); }
+  .portrait {
+    width: clamp(70px, 11vw, 170px); aspect-ratio: 3/4; border-radius: 999px; overflow: hidden; position: relative; flex: none;
+    background: linear-gradient(160deg, #2b2a27, #6b665c); transform: scale(0); transition: transform 1.2s .5s cubic-bezier(.19,1,.22,1);
+  }
+  .in .portrait { transform: scale(1); }
+  .portrait::after { content: "TU FOTO"; position: absolute; inset: 0; display: grid; place-items: center; color: #f1eee7aa; font: 10px "JetBrains Mono"; letter-spacing: .1em; }
+  .hero .lede { max-width: 440px; margin-top: 34px; font-size: 19px; line-height: 1.35; }
+  .hero .lede em { font-family: "Instrument Serif"; font-size: 1.2em; }
+  .hero-meta { position: absolute; bottom: 22px; left: 24px; right: 24px; display: flex; justify-content: space-between; color: var(--mute); }
+
+  /* Ticker */
+  .ticker { border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); overflow: hidden; padding: 14px 0; background: var(--ink); color: var(--paper); }
+  .ticker div { display: flex; width: max-content; animation: tk 30s linear infinite; }
+  .ticker span { font-size: 22px; padding-right: 40px; white-space: nowrap; }
+  .ticker span b { color: var(--accent); font-weight: 400; }
+  @keyframes tk { to { transform: translateX(-50%); } }
+
+  /* Project list (A24) */
+  .list { padding: 14vh 24px 10vh; }
+  .list-head { display: flex; justify-content: space-between; color: var(--mute); padding-bottom: 14px; border-bottom: 1px solid var(--rule); }
+  .item { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--rule); position: relative; cursor: pointer; }
+  .item h3 { font-weight: 800; font-size: clamp(44px, 8.6vw, 140px); letter-spacing: -.055em; line-height: .95; transition: transform .6s cubic-bezier(.19,1,.22,1), color .3s; }
+  .item sup { font-family: "JetBrains Mono"; font-size: 12px; margin-top: 1.1em; transition: color .3s; }
+  .item .cat { margin-left: auto; align-self: center; color: var(--mute); text-align: right; transition: opacity .3s; }
+  .list:hover .item h3 { color: #c9c4b8; }
+  .list .item:hover h3 { color: var(--ink); transform: translateX(28px); }
+  .list .item:hover sup { color: var(--accent); }
+  .item h3 .serif { font-style: italic; letter-spacing: -.02em; font-weight: 400; }
+
+  .float {
+    position: fixed; left: 0; top: 0; width: 340px; aspect-ratio: 4/3; pointer-events: none; z-index: 30; border-radius: 4px; overflow: hidden;
+    opacity: 0; transform: translate(-50%,-50%) scale(.6); transition: opacity .3s;
+  }
+  .float.on { opacity: 1; }
+  .float .layer { position: absolute; inset: 0; transition: clip-path .6s cubic-bezier(.7,0,.2,1); clip-path: inset(100% 0 0 0); }
+  .float .layer.show { clip-path: inset(0 0 0 0); }
+  .float .label { position: absolute; left: 12px; bottom: 10px; color: #fff; mix-blend-mode: difference; }
+
+  /* Index table */
+  .index { padding: 6vh 24px 14vh; }
+  .index h2 { font-size: clamp(40px, 6vw, 90px); letter-spacing: -.04em; line-height: .9; margin-bottom: 40px; }
+  .index h2 .serif { font-style: italic; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th { text-align: left; font-weight: 400; color: var(--mute); padding: 10px 0; border-bottom: 1px solid var(--ink); }
+  td { padding: 12px 0; border-bottom: 1px solid var(--rule); transition: background .2s, padding .3s; }
+  tr:hover td { background: var(--ink); color: var(--paper); }
+  tr:hover td:first-child { padding-left: 12px; }
+
+  /* About */
+  .about { display: grid; grid-template-columns: 1fr 1fr; gap: 6vw; padding: 12vh 24px; border-top: 1px solid var(--ink); }
+  .about p { font-size: clamp(24px, 2.6vw, 38px); line-height: 1.15; letter-spacing: -.02em; }
+  .about p .serif { font-style: italic; font-size: 1.12em; }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--rule); align-self: start; }
+  .stat { background: var(--paper); padding: 22px 0 22px 18px; }
+  .stat b { display: block; font-size: clamp(54px, 6vw, 96px); font-weight: 900; letter-spacing: -.06em; line-height: 1; }
+  .stat span { color: var(--mute); }
+  .fade { opacity: 0; transform: translateY(40px); transition: opacity 1s, transform 1s cubic-bezier(.19,1,.22,1); }
+  .fade.seen { opacity: 1; transform: none; }
+
+  /* Footer */
+  footer { background: var(--ink); color: var(--paper); padding: 10vh 24px 22px; overflow: hidden; }
+  footer .cta { display: flex; justify-content: space-between; align-items: end; flex-wrap: wrap; gap: 24px; margin-bottom: 8vh; }
+  footer .cta p { font-size: clamp(30px, 4vw, 56px); letter-spacing: -.03em; line-height: 1; max-width: 700px; }
+  footer .cta p .serif { font-style: italic; color: var(--accent); }
+  .copy { border: 1px solid var(--paper); border-radius: 99px; padding: 16px 26px; font-size: 16px; background: none; color: inherit; cursor: pointer; font-family: inherit; transition: background .3s, color .3s; }
+  .copy:hover { background: var(--accent); border-color: var(--accent); }
+  .giant { font-weight: 900; text-transform: uppercase; letter-spacing: -.07em; line-height: .78; white-space: nowrap; display: block; }
+  .giant i { display: inline-block; font-style: normal; transition: transform .5s cubic-bezier(.19,1,.22,1), color .3s; }
+  .giant i:hover { transform: translateY(-12%) scaleY(1.15); color: var(--accent); }
+  footer .bottom { display: flex; justify-content: space-between; margin-top: 18px; color: var(--mute); }
+
+  @media (max-width: 760px) {
+    nav { grid-template-columns: 1fr 1fr; } nav .c { display: none; }
+    .about { grid-template-columns: 1fr; }
+    .item .cat { display: none; }
+    .float { width: 220px; }
+    th:nth-child(3), td:nth-child(3) { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<nav class="mono">
+  <a href="#"><span data-t="Yesid Carrillo">Yesid Carrillo</span></a>
+  <div class="c"><a href="#obras"><span data-t="Obras">Obras</span></a>, <a href="#indice"><span data-t="Índice">Índice</span></a>, <a href="#sobre"><span data-t="Sobre mí">Sobre mí</span></a></div>
+  <div class="r"><span class="dot"></span><span id="clock">Bogotá 00:00</span></div>
+</nav>
+
+<header class="hero" id="hero">
+  <p class="eyebrow mono">Portafolio — Vol. 03 / 2026</p>
+  <div class="hero-row"><span class="big" data-split>Yesid</span><div class="portrait"></div></div>
+  <div class="big-serif serif" data-split>Carrillo</div>
+  <p class="lede">Desarrollo productos digitales con <em>honestidad narrativa</em>, rendimiento obsesivo y una debilidad por el detalle.</p>
+  <div class="hero-meta mono"><span>(↓) Desliza</span><span>Desarrollador & diseñador de interfaces</span><span>Bogotá, CO</span></div>
+</header>
+
+<div class="ticker"><div>
+  <span>Disponible para proyectos <b>✦</b></span><span class="serif" style="font-style:italic">freelance & full-time</span><span><b>✦</b> Producto · Web · Mobile · IA</span><span class="serif" style="font-style:italic">hagamos algo memorable</span>
+  <span>Disponible para proyectos <b>✦</b></span><span class="serif" style="font-style:italic">freelance & full-time</span><span><b>✦</b> Producto · Web · Mobile · IA</span><span class="serif" style="font-style:italic">hagamos algo memorable</span>
+</div></div>
+
+<section class="list" id="obras">
+  <div class="list-head mono"><span>Obras seleccionadas (06)</span><span>Pasa el cursor</span></div>
+  <div id="items"></div>
+</section>
+
+<div class="float" id="float"><span class="label mono" id="flabel"></span></div>
+
+<section class="index" id="indice">
+  <h2 class="fade">Índice <span class="serif">completo</span></h2>
+  <table class="fade">
+    <thead class="mono"><tr><th>Proyecto</th><th>Rol</th><th>Stack</th><th>Año</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+</section>
+
+<section class="about" id="sobre">
+  <p class="fade">Creo que una buena interfaz es <span class="serif">invisible</span> hasta que la quitas. Trabajo entre el código y el diseño para que las ideas lleguen a producción <span class="serif">sin perder su alma.</span></p>
+  <div class="stats fade">
+    <div class="stat"><b data-count="6">0</b><span class="mono">Años de oficio</span></div>
+    <div class="stat"><b data-count="40">0</b><span class="mono">Productos lanzados</span></div>
+    <div class="stat"><b data-count="12">0</b><span class="mono">Clientes felices</span></div>
+    <div class="stat"><b data-count="99">0</b><span class="mono">Lighthouse promedio</span></div>
+  </div>
+</section>
+
+<footer>
+  <div class="cta">
+    <p>¿Tienes un proyecto en mente? <span class="serif">Hablemos de él.</span></p>
+    <button class="copy" id="copy">hola@tudominio.com — Copiar</button>
+  </div>
+  <span class="giant" id="giant">Yesid Carrillo</span>
+  <div class="bottom mono"><span>GitHub · LinkedIn · X</span><span>© 2026</span></div>
+</footer>
+
+<script>
+const projects = [
+  { n: 'Atlas', y: '2026', cat: 'SaaS · Analítica', rol: 'Lead dev', st: 'Next.js, Supabase', bg: 'radial-gradient(circle at 30% 30%, #ff3b00, #2a0a00 70%)' },
+  { n: 'Nébula', y: '2025', cat: 'Fintech · Mobile', rol: 'Full-stack', st: 'React Native, Node', bg: 'linear-gradient(135deg, #1b1b4a, #6d5bff 50%, #e6e0ff)' },
+  { n: 'Kiosko', y: '2025', cat: 'E-commerce', rol: 'Front-end', st: 'Remix, Shopify', bg: 'repeating-linear-gradient(45deg, #111 0 14px, #f1eee7 14px 28px)' },
+  { n: 'Pulso', y: '2024', cat: 'IoT · Dashboard', rol: 'Full-stack', st: 'Vue, WebSockets', bg: 'radial-gradient(circle at 70% 60%, #c8ff3d, #0f2a12 65%)' },
+  { n: 'Eco', y: '2026', cat: 'IA conversacional', rol: 'Creador', st: 'Claude API, TS', bg: 'conic-gradient(from 90deg, #111, #8b877d, #f1eee7, #111)', serif: true },
+  { n: 'Mareas', y: '2024', cat: 'Editorial · 3D', rol: 'Creative dev', st: 'Three.js, GSAP', bg: 'linear-gradient(180deg, #e8f3ff, #4b8fd6 50%, #08223f)', serif: true },
+];
+
+/* split letters */
+document.querySelectorAll('[data-split]').forEach(el => {
+  el.innerHTML = [...el.textContent].map((c, i) => `<span class="split"><i style="transition-delay:${i * .05}s">${c}</i></span>`).join('');
+});
+requestAnimationFrame(() => setTimeout(() => document.getElementById('hero').classList.add('in'), 120));
+
+/* clock */
+const clock = document.getElementById('clock');
+const tickClock = () => clock.textContent = 'Bogotá ' + new Date().toLocaleTimeString('es-CO', { timeZone: 'America/Bogota', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+tickClock(); setInterval(tickClock, 1000);
+
+/* list + floating preview */
+const items = document.getElementById('items'), float = document.getElementById('float'), flabel = document.getElementById('flabel');
+items.innerHTML = projects.map((p, i) => `<a class="item" data-i="${i}"><h3>${p.serif ? `<span class="serif">${p.n}</span>` : p.n}</h3><sup>${p.y}</sup><span class="cat mono">${p.cat}</span></a>`).join('');
+float.insertAdjacentHTML('afterbegin', projects.map(p => `<div class="layer" style="background:${p.bg}"></div>`).join(''));
+const layers = float.querySelectorAll('.layer');
+let fx = 0, fy = 0, tx = 0, ty = 0, vx = 0, zTop = 1, hideT;
+addEventListener('pointermove', e => { tx = e.clientX; ty = e.clientY; });
+items.querySelectorAll('.item').forEach(it => {
+  it.addEventListener('pointerenter', () => {
+    const i = +it.dataset.i;
+    float.classList.add('on');
+    // the new cover wipes up over the previous one, which is hidden once covered
+    layers[i].style.zIndex = ++zTop;
+    layers[i].classList.add('show');
+    clearTimeout(hideT);
+    hideT = setTimeout(() => layers.forEach((l, j) => j !== i && l.classList.remove('show')), 600);
+    flabel.textContent = projects[i].cat;
+  });
+});
+items.addEventListener('pointerleave', () => { float.classList.remove('on'); layers.forEach(l => l.classList.remove('show')); });
+(function loop() {
+  const nx = fx + (tx - fx) * .12; vx = nx - fx; fx = nx; fy += (ty - fy) * .12;
+  const rot = Math.max(-14, Math.min(14, vx * .6));
+  float.style.transform = `translate(${fx}px, ${fy}px) translate(-50%,-50%) rotate(${rot}deg) scale(${float.classList.contains('on') ? 1 : .6})`;
+  requestAnimationFrame(loop);
+})();
+
+/* table */
+document.getElementById('rows').innerHTML = projects.map(p => `<tr><td>${p.n}</td><td>${p.rol}</td><td>${p.st}</td><td>${p.y}</td></tr>`).join('');
+
+/* reveal + counters */
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return;
+  e.target.classList.add('seen');
+  e.target.querySelectorAll('[data-count]').forEach(b => {
+    const end = +b.dataset.count, t0 = performance.now();
+    const step = t => { const k = Math.min(1, (t - t0) / 1400); b.textContent = Math.round(end * (1 - Math.pow(1 - k, 4))); if (k < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  });
+  io.unobserve(e.target);
+}), { threshold: .2 });
+document.querySelectorAll('.fade').forEach(el => io.observe(el));
+
+/* giant footer name: fit to width + per-letter hover */
+const giant = document.getElementById('giant');
+giant.innerHTML = [...giant.textContent].map(c => c === ' ' ? '&nbsp;' : `<i>${c}</i>`).join('');
+const fit = () => { giant.style.fontSize = '100px'; giant.style.fontSize = (100 * (giant.parentElement.clientWidth - 48) / giant.scrollWidth) + 'px'; };
+document.fonts.ready.then(fit); addEventListener('resize', fit);
+
+/* copy email */
+const copy = document.getElementById('copy');
+copy.addEventListener('click', () => {
+  navigator.clipboard?.writeText('hola@tudominio.com');
+  copy.textContent = '¡Copiado! ✓'; setTimeout(() => copy.textContent = 'hola@tudominio.com — Copiar', 1800);
+});
+</script>
+</body>
+</html>
