@@ -4,7 +4,7 @@
  */
 
 /** Tarifa por hora en COP. */
-export const HOURLY_RATE = 80_000;
+export const HOURLY_RATE = 40_000;
 /** Colchón para reuniones, ajustes y QA no previstos. */
 export const CONTINGENCY = 0.15;
 /** Los precios públicos se redondean hacia arriba a este múltiplo. */

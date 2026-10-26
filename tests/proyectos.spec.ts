@@ -18,7 +18,7 @@ test.describe('proyectos: galería horizontal', () => {
     expect((await last.boundingBox())!.x).toBeGreaterThan(1440);
 
     // Al final, la última tarjeta queda completa dentro de la pantalla.
-    await page.evaluate(([t, h]) => scrollTo(0, t - 64 + h - (innerHeight - 64)), [top, height]);
+    await page.evaluate(([t, h]) => scrollTo(0, t! - 64 + h! - (innerHeight - 64)), [top, height]);
     await page.waitForTimeout(400);
     const box = (await last.boundingBox())!;
     expect(box.x).toBeGreaterThanOrEqual(0);

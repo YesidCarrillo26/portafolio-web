@@ -68,6 +68,6 @@ describe('WhatsApp', () => {
     const text = planMessage(plans.find((p) => p.id === 'app-mvp')!);
     expect(text).toContain('App MVP');
     expect(text).toContain('app móvil');
-    expect(text).toContain('14.750.000');
+    expect(text).toContain('7.400.000');
   });
 });
